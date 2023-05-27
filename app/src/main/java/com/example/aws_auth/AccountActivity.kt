@@ -47,15 +47,23 @@ class AccountActivity : AppCompatActivity() {
         }
     }
 
+    // Funkcija ziņas parādīšanai
+    private fun showToast(message: String) {
+        runOnUiThread {
+            Toast.makeText(this, message, Toast.LENGTH_LONG)
+                .show()
+        }
+    }
+
     // Funkcija paroles mainīšanai
     private fun changePassword(password: String, newPassword: String) {
         Amplify.Auth.updatePassword(password, newPassword,
             {
                 // Parole veiskmīgi nomainīta
-                Toast.makeText(this, "Password changed successfully.", Toast.LENGTH_LONG).show()
+                showToast("Password changed successfully.")
             },
             {
-                Toast.makeText(this, "Password is not changed. There was an error.", Toast.LENGTH_LONG).show()
+                showToast("Password is not changed. There was an error.")
             }
         )
     }
@@ -69,7 +77,7 @@ class AccountActivity : AppCompatActivity() {
                 toSignIn()
             },
             {
-                Toast.makeText(this, "Account is not deleted. There was an error.", Toast.LENGTH_LONG).show()
+                showToast("Account is not deleted. There was an error.")
             }
         )
     }
@@ -97,7 +105,7 @@ class AccountActivity : AppCompatActivity() {
                 }
                 is AWSCognitoAuthSignOutResult.FailedSignOut -> {
                     // Izrakstīšanās neveiksmīga
-                    Toast.makeText(this, "Sign out failed. There was an error.", Toast.LENGTH_LONG).show()
+                    showToast("Sign out failed. There was an error.")
                 }
             }
         }

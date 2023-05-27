@@ -59,11 +59,11 @@ class SignInActivity : AppCompatActivity() {
                 if (result.isSignedIn) {
                     toAccount()
                 } else {
-                    Toast.makeText(this, "Sign in not complete. There was an error.", Toast.LENGTH_LONG).show()
+                    showToast("Sign in not complete. There was an error.")
                 }
             },
             {
-                Toast.makeText(this, "Sign in failed. There was an error.", Toast.LENGTH_LONG).show()
+                showToast("Sign in failed. There was an error.")
             }
         )
     }
@@ -82,6 +82,14 @@ class SignInActivity : AppCompatActivity() {
         ContextCompat.startActivity(this, intent, null)
     }
 
+    // Funkcija ziņas parādīšanai
+    private fun showToast(message: String) {
+        runOnUiThread {
+            Toast.makeText(this, message, Toast.LENGTH_LONG)
+                .show()
+        }
+    }
+
     // Funkcijas paroles atjaunošanai
     private fun resetPassword1(username: String) {
         Amplify.Auth.resetPassword(username,
@@ -89,28 +97,30 @@ class SignInActivity : AppCompatActivity() {
                 openResetPasswordWindow(username)
             },
             {
-                Toast.makeText(this, "Password reset failed. There was an error.", Toast.LENGTH_LONG).show()
+                showToast("Password reset failed. There was an error.")
             }
         )
     }
 
     private fun openResetPasswordWindow(username: String) {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.reset_password_layout, null)
-        val builder = AlertDialog.Builder(this)
-            .setView(dialogView)
-        val alertDialog = builder.show()
-        this.alertDialog = alertDialog
+        runOnUiThread {
+            val dialogView = LayoutInflater.from(this).inflate(R.layout.reset_password_layout, null)
+            val builder = AlertDialog.Builder(this)
+                .setView(dialogView)
+            val alertDialog = builder.show()
+            this.alertDialog = alertDialog
 
-        dialogView.findViewById<EditText>(R.id.username_et).setText(username)
+            dialogView.findViewById<EditText>(R.id.username_et).setText(username)
 
-        dialogView.findViewById<Button>(R.id.reset_btn).setOnClickListener {
-            val username = dialogView.findViewById<EditText>(R.id.username_et).text.toString()
-            val password = dialogView.findViewById<EditText>(R.id.password_et).text.toString()
-            val code = dialogView.findViewById<EditText>(R.id.code_et).text.toString()
-            resetPassword2(username, password, code)
-        }
-        dialogView.findViewById<Button>(R.id.close_btn).setOnClickListener {
-            alertDialog.dismiss()
+            dialogView.findViewById<Button>(R.id.reset_btn).setOnClickListener {
+                val username = dialogView.findViewById<EditText>(R.id.username_et).text.toString()
+                val password = dialogView.findViewById<EditText>(R.id.password_et).text.toString()
+                val code = dialogView.findViewById<EditText>(R.id.code_et).text.toString()
+                resetPassword2(username, password, code)
+            }
+            dialogView.findViewById<Button>(R.id.close_btn).setOnClickListener {
+                alertDialog.dismiss()
+            }
         }
     }
 
@@ -120,7 +130,7 @@ class SignInActivity : AppCompatActivity() {
                 alertDialog.dismiss()
             },
             {
-                Toast.makeText(this, "Password reset not confirmed. There was an error.", Toast.LENGTH_LONG).show()
+                showToast("Password reset not confirmed. There was an error.")
             }
         )
     }

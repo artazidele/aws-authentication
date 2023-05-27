@@ -1,7 +1,6 @@
 package com.example.aws_auth
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.options.AuthSignUpOptions
@@ -63,32 +63,40 @@ class SignUpActivity : AppCompatActivity() {
             .build()
         Amplify.Auth.signUp(username, password, options,
             {
-                // reģistrēšanās veiksmīga
-                // atver epasta pārbaudes logu
                 openEmailVerificationWindow(username)
             },
             {
                 // reģistrēšanās nav veiksmīga
-                Toast.makeText(this, "Sign up failed. There was an error.", Toast.LENGTH_LONG).show()
+                showToast("Sign up failed. There was an error.")
             }
         )
     }
 
+    // Funkcija ziņas parādīšanai
+    private fun showToast(message: String) {
+        runOnUiThread {
+            Toast.makeText(this, message, Toast.LENGTH_LONG)
+                .show()
+        }
+    }
+
     // Funkcija epasta pārbaudes loga atvēršanai
     private fun openEmailVerificationWindow(username: String) {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.verify_email_layout, null)
-        val builder = AlertDialog.Builder(this)
-            .setView(dialogView)
-        val alertDialog = builder.show()
-        dialogView.findViewById<EditText>(R.id.username_et).setText(username)
+        runOnUiThread {
+            val dialogView = LayoutInflater.from(this).inflate(R.layout.verify_email_layout, null)
+            val builder = AlertDialog.Builder(this)
+                .setView(dialogView)
+            val alertDialog = builder.show()
+            dialogView.findViewById<EditText>(R.id.username_et).setText(username)
 
-        dialogView.findViewById<Button>(R.id.send_btn).setOnClickListener {
-            val username = dialogView.findViewById<EditText>(R.id.username_et).text.toString()
-            val code = dialogView.findViewById<EditText>(R.id.code_et).text.toString()
-            verifyEmail(username, code)
-        }
-        dialogView.findViewById<Button>(R.id.close_btn).setOnClickListener {
-            alertDialog.dismiss()
+            dialogView.findViewById<Button>(R.id.send_btn).setOnClickListener {
+                val username = dialogView.findViewById<EditText>(R.id.username_et).text.toString()
+                val code = dialogView.findViewById<EditText>(R.id.code_et).text.toString()
+                verifyEmail(username, code)
+            }
+            dialogView.findViewById<Button>(R.id.close_btn).setOnClickListener {
+                alertDialog.dismiss()
+            }
         }
     }
 
@@ -100,11 +108,11 @@ class SignUpActivity : AppCompatActivity() {
                 if (result.isSignUpComplete) {
                     toSignIn()
                 } else {
-                    Toast.makeText(this, "Sign up confirmation not completed. There was an error.", Toast.LENGTH_LONG).show()
+                    showToast("Sign up confirmation not completed. There was an error.")
                 }
             },
             {
-                Toast.makeText(this, "Sign up confirmation failed. There was an error.", Toast.LENGTH_LONG).show()
+                showToast("Sign up confirmation failed. There was an error.")
             }
         )
     }
